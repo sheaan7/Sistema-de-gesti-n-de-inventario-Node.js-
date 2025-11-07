@@ -1,0 +1,15 @@
+{
+  "name": "inventory-frontend",
+  "version": "1.0.0",
+  "description": "Frontend del Sistema de Inventario",
+  "scripts": {
+    "start": "npx http-server public -p 8080 -o",
+    "serve": "py -m http.server 8080 --directory public"
+  },
+  "keywords": ["inventory", "frontend"],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "http-server": "^14.1.1"
+  }
+}
