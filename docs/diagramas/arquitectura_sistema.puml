@@ -1,0 +1,194 @@
+@startuml Arquitectura_Sistema
+
+title Arquitectura del Sistema - Gestión de Inventario
+
+!define RECTANGLE class
+
+' Estilos
+skinparam componentStyle rectangle
+skinparam linetype ortho
+
+' Capa de Presentación
+package "Capa de Presentación" #LightBlue {
+  [Navegador Web] as Browser
+  
+  package "Frontend (Nginx)" #AliceBlue {
+    [index.html] as HTML
+    [styles.css] as CSS
+    [app.js] as JS
+    
+    component "UI Components" as UI {
+      [Formulario de Producto]
+      [Tabla de Productos]
+      [Buscador]
+      [Filtros]
+    }
+  }
+}
+
+' Capa de Aplicación
+package "Capa de Aplicación (Backend)" #LightGreen {
+  package "Express Server" #Honeydew {
+    [Server Entry Point\nserver.js] as Server
+    
+    component "Middleware Layer" as Middleware {
+      [CORS]
+      [Body Parser]
+      [Error Handler]
+      [Logger]
+    }
+    
+    component "Routes" as Routes {
+      [Product Routes\n/api/products/*]
+      [Sync Routes\n/api/sync/*]
+      [Health Check\n/health]
+    }
+    
+    component "Controllers" as Controllers {
+      [Product Controller]
+      [Sync Controller]
+    }
+    
+    component "Services" as Services {
+      [Sync Service]
+      [Validation Service]
+    }
+  }
+  
+  component "Cron Scheduler" as Cron #LightYellow {
+    [node-cron\n(*/30 * * * *)]
+  }
+}
+
+' Capa de Datos
+package "Capa de Datos" #LightYellow {
+  component "Database Layer" as DBLayer {
+    [Database Class]
+    [CRUD Operations]
+  }
+  
+  database "MongoDB" as MongoDB {
+    [Products Collection]
+    [Sync Logs]
+  }
+  
+  storage "File System\n(Desarrollo)" as FileSystem {
+    [products.json]
+  }
+}
+
+' API Externa
+cloud "Internet" {
+  package "API Externa" #LightPink {
+    [FakeStore API\nhttps://fakestoreapi.com] as FakeStore
+    
+    component "Endpoints" as ExtEndpoints {
+      [GET /products]
+      [GET /products/:id]
+      [GET /products/categories]
+    }
+  }
+}
+
+' Infraestructura Docker
+package "Docker Infrastructure" #LightGray {
+  node "Container: Frontend" as ContainerFE #AliceBlue {
+    [Nginx Server\nPuerto 80]
+    [Static Files]
+  }
+  
+  node "Container: Backend" as ContainerBE #Honeydew {
+    [Node.js Runtime\nPuerto 3000]
+    [Express App]
+  }
+  
+  node "Container: Database" as ContainerDB #LightYellow {
+    [MongoDB\nPuerto 27017]
+    [Data Volume]
+  }
+  
+  [Docker Network\ninventory_network] as Network
+}
+
+' Relaciones - Capa de Presentación
+Browser --> HTML : HTTP GET /
+HTML --> CSS : Carga estilos
+HTML --> JS : Carga scripts
+JS --> UI : Renderiza
+Browser --> Routes : API REST\n(JSON)
+
+' Relaciones - Backend Flow
+Routes --> Controllers : Delega
+Controllers --> Services : Utiliza
+Controllers --> DBLayer : Accede
+Services --> DBLayer : Lee/Escribe
+
+' Relaciones - Cron y Sincronización
+Cron --> Services : Trigger periódico
+Services --> FakeStore : HTTP GET\nFetch products
+FakeStore --> Services : JSON Response
+
+' Relaciones - Persistencia
+DBLayer --> MongoDB : Conexión\n(Producción)
+DBLayer --> FileSystem : Lectura/Escritura\n(Desarrollo)
+
+' Relaciones - Docker
+ContainerFE --> Browser : Sirve contenido
+Browser --> ContainerFE : Puerto 8080
+Browser --> ContainerBE : Puerto 3000
+ContainerBE --> ContainerDB : Puerto 27017
+ContainerFE --> Network : Conectado
+ContainerBE --> Network : Conectado
+ContainerDB --> Network : Conectado
+
+' Relaciones - Componentes internos
+Server --> Middleware : Usa
+Middleware --> Routes : Pasa request
+[Product Controller] --> [Product Routes\n/api/products/*] : Maneja
+[Sync Controller] --> [Sync Routes\n/api/sync/*] : Maneja
+
+' Notas
+note right of Browser
+  **Usuario final**
+  Interactúa con la interfaz web
+  para gestionar productos
+end note
+
+note right of FakeStore
+  **API Externa**
+  - Proporciona 20 productos
+  - Actualiza precios y datos
+  - Sin autenticación requerida
+end note
+
+note bottom of Cron
+  **Sincronización Automática**
+  - Intervalo: Cada 30 minutos
+  - Configurable vía ENV
+  - Ejecuta en background
+end note
+
+note left of MongoDB
+  **Base de Datos**
+  - Desarrollo: JSON file
+  - Producción: MongoDB
+  - Persistencia mediante volumen Docker
+end note
+
+note top of Network
+  **Red Docker Interna**
+  Permite comunicación segura
+  entre contenedores usando
+  nombres de servicio como DNS
+end note
+
+' Leyenda
+legend right
+  |<#LightBlue> Color | Capa de Presentación |
+  |<#LightGreen> Color | Capa de Aplicación |
+  |<#LightYellow> Color | Capa de Datos |
+  |<#LightPink> Color | Servicios Externos |
+  |<#LightGray> Color | Infraestructura |
+endlegend
+
+@enduml

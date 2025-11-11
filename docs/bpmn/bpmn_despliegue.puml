@@ -1,0 +1,196 @@
+@startuml BPMN_Despliegue
+
+title BPMN - Proceso de Despliegue con Docker
+
+|Desarrollador|
+start
+:Clonar repositorio\ndel proyecto;
+
+:Verificar requisitos:\n- Docker instalado\n- Docker Compose instalado;
+
+if (¿Requisitos cumplidos?) then (No)
+  :Instalar Docker\ny Docker Compose;
+else (Sí)
+endif
+
+:Revisar configuración\nde variables de entorno;
+
+|Sistema|
+:Leer archivo\ndocker-compose.yml;
+
+== Construcción de Imágenes ==
+
+:Ejecutar:\ndocker-compose build;
+
+fork
+  |Backend Container|
+  :Leer Dockerfile\nde backend;
+  :Establecer imagen base:\nnode:18-alpine;
+  :Crear directorio\nde trabajo /app;
+  :Copiar package*.json;
+  :Instalar dependencias\ncon npm ci;
+  :Copiar código fuente;
+  :Exponer puerto 3000;
+  :Definir comando de inicio:\nnpm start;
+  :Imagen backend\nconstruida;
+  
+fork again
+  |Frontend Container|
+  :Leer Dockerfile\nde frontend;
+  :Establecer imagen base:\nnginx:alpine;
+  :Copiar archivos estáticos\na /usr/share/nginx/html;
+  :Configurar nginx.conf;
+  :Exponer puerto 80;
+  :Imagen frontend\nconstruida;
+  
+fork again
+  |Database Container|
+  :Obtener imagen oficial:\nmongo:7;
+  :Configurar volumen\npara persistencia;
+  :Exponer puerto 27017;
+  :Imagen database\nlista;
+end fork
+
+== Creación de Red ==
+
+|Sistema|
+:Crear red Docker\ninterna para containers;
+
+:Configurar DNS\ninterno para\ncomunicación entre\ncontenedores;
+
+== Creación de Volúmenes ==
+
+:Crear volumen\npara MongoDB:\ninventory_mongodb-data;
+
+:Crear volumen\npara logs (opcional);
+
+== Inicio de Contenedores ==
+
+|Desarrollador|
+:Ejecutar:\ndocker-compose up -d;
+
+|Sistema|
+fork
+  |Database Container|
+  :Iniciar contenedor\nMongoDB;
+  :Montar volumen\nde datos;
+  :Inicializar base\nde datos;
+  :MongoDB listo\nen puerto 27017;
+  
+fork again
+  |Backend Container|
+  :Iniciar contenedor\nBackend;
+  :Cargar variables\nde entorno;
+  :Esperar conexión\na MongoDB;
+  
+  if (¿MongoDB disponible?) then (No)
+    :Reintentar conexión\n(max 5 intentos);
+  else (Sí)
+  endif
+  
+  :Conectar a MongoDB;
+  :Iniciar servidor Express\nen puerto 3000;
+  :Iniciar Cron Job\nde sincronización;
+  :Backend listo;
+  
+fork again
+  |Frontend Container|
+  :Iniciar contenedor\nFrontend;
+  :Iniciar Nginx;
+  :Servir archivos\nestáticos;
+  :Frontend listo\nen puerto 80;
+end fork
+
+== Verificación de Salud ==
+
+|Sistema|
+:Health check Backend:\nGET /health;
+
+if (¿Backend responde?) then (No)
+  :Registrar error;
+  :Reiniciar contenedor\nbackend;
+else (Sí)
+  :Backend saludable;
+endif
+
+:Health check Frontend:\nGET /;
+
+if (¿Frontend responde?) then (No)
+  :Registrar error;
+  :Reiniciar contenedor\nfrontend;
+else (Sí)
+  :Frontend saludable;
+endif
+
+:Verificar conectividad\nBackend <-> Database;
+
+if (¿Conexión OK?) then (No)
+  :Revisar configuración\nde red;
+  :Reintentar;
+else (Sí)
+  :Todos los servicios\nconectados;
+endif
+
+== Aplicación en Ejecución ==
+
+|Desarrollador|
+:Verificar logs:\ndocker-compose logs -f;
+
+:Probar endpoints\nde la API;
+
+:Acceder a la interfaz:\nhttp://localhost:8080;
+
+:Verificar sincronización\nautomática;
+
+if (¿Todo funciona?) then (No)
+  :Revisar logs\nde errores;
+  :Ajustar configuración;
+  :Reconstruir y reiniciar:\ndocker-compose down\ndocker-compose up --build;
+else (Sí)
+  :Aplicación desplegada\nexitosamente;
+  
+  == Mantenimiento ==
+  
+  :Monitorear logs\nperiódicamente;
+  
+  :Realizar backup\nde base de datos;
+  
+  note right
+    Backup comando:
+    docker exec inventory-db \
+      mongodump --out /dump
+  end note
+  
+  if (¿Necesita actualización?) then (Sí)
+    :Pull cambios del repo;
+    :docker-compose down;
+    :docker-compose build;
+    :docker-compose up -d;
+  endif
+  
+  if (¿Detener aplicación?) then (Sí)
+    :Ejecutar:\ndocker-compose down;
+    
+    if (¿Eliminar datos?) then (Sí)
+      :Ejecutar:\ndocker-compose down -v;
+    endif
+    
+    stop
+  else (No)
+    :Aplicación continúa\nejecutándose;
+  endif
+endif
+
+stop
+
+note bottom
+  Contenedores en ejecución:
+  - inventory-backend (puerto 3000)
+  - inventory-frontend (puerto 80 -> 8080)
+  - inventory-db (puerto 27017)
+  
+  Red: inventory_network
+  Volumen: inventory_mongodb-data
+end note
+
+@enduml

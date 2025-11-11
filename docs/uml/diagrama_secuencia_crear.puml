@@ -1,0 +1,64 @@
+@startuml Diagrama_Secuencia
+
+title Diagrama de Secuencia - Crear Producto
+
+actor Usuario
+participant "Frontend" as FE
+participant "Express\nRouter" as Router
+participant "Product\nController" as Controller
+participant "Database" as DB
+participant "File\nSystem" as FS
+
+Usuario -> FE: Clic en "Agregar Producto"
+activate FE
+
+FE -> FE: Mostrar formulario
+Usuario -> FE: Ingresar datos y enviar
+
+FE -> FE: Validar datos del formulario
+FE -> Router: POST /api/products\n{title, price, description, category, image}
+activate Router
+
+Router -> Controller: createProduct(req, res)
+activate Controller
+
+Controller -> Controller: Validar datos requeridos
+alt Datos inválidos
+    Controller -> Router: 400 Bad Request\n{error: "Datos inválidos"}
+    Router -> FE: Error response
+    FE -> Usuario: Mostrar mensaje de error
+else Datos válidos
+    Controller -> DB: create(productData)
+    activate DB
+    
+    DB -> DB: generateId()
+    DB -> DB: Agregar timestamps\n(createdAt, updatedAt)
+    
+    DB -> FS: read products.json
+    activate FS
+    FS --> DB: productos existentes
+    deactivate FS
+    
+    DB -> DB: Agregar nuevo producto\nal array
+    
+    DB -> FS: write products.json\n(productos actualizados)
+    activate FS
+    FS --> DB: escritura exitosa
+    deactivate FS
+    
+    DB --> Controller: nuevo producto
+    deactivate DB
+    
+    Controller -> Router: 201 Created\n{producto creado}
+    deactivate Controller
+    
+    Router -> FE: Response con producto
+    deactivate Router
+    
+    FE -> FE: Agregar producto a la lista
+    FE -> Usuario: Mostrar producto en tabla\ny mensaje de éxito
+end
+
+deactivate FE
+
+@enduml

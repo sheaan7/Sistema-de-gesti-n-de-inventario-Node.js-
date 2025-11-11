@@ -1,0 +1,83 @@
+version: '3.8'
+
+services:
+  # Base de Datos MongoDB
+  db:
+    image: mongo:7
+    container_name: inventory-db
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_DATABASE: inventory
+    volumes:
+      - mongodb-data:/data/db
+    networks:
+      - inventory-network
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/inventory --quiet
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Backend Node.js
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: inventory-backend
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - PORT=3000
+      - NODE_ENV=production
+      - MONGODB_URI=mongodb://db:27017/inventory
+      - EXTERNAL_API_URL=https://fakestoreapi.com
+      - SYNC_INTERVAL=*/30 * * * *
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - ./backend/src:/app/src:ro
+      - backend-logs:/app/logs
+    networks:
+      - inventory-network
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Frontend Nginx
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: inventory-frontend
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+    depends_on:
+      - backend
+    environment:
+      - BACKEND_URL=http://backend:3000
+    networks:
+      - inventory-network
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:80"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+networks:
+  inventory-network:
+    driver: bridge
+    name: inventory_network
+
+volumes:
+  mongodb-data:
+    name: inventory_mongodb-data
+  backend-logs:
+    name: inventory_backend-logs

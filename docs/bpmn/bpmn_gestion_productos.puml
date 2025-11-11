@@ -1,0 +1,109 @@
+@startuml BPMN_Gestion_Productos
+
+title BPMN - Proceso de Gestión de Productos
+
+|Usuario|
+start
+:Acceder al sistema de inventario;
+
+:Visualizar listado\nde productos;
+
+:Decidir acción a realizar;
+
+|Sistema|
+if (¿Qué operación?) then (Crear)
+  |Usuario|
+  :Clic en "Agregar Producto";
+  :Completar formulario\n(título, precio, descripción,\ncategoría, imagen);
+  
+  |Sistema|
+  :Validar datos\ndel formulario;
+  
+  if (¿Datos válidos?) then (No)
+    :Mostrar errores\nde validación;
+    |Usuario|
+    :Corregir datos;
+    |Sistema|
+  else (Sí)
+    :Generar ID único;
+    :Agregar timestamps;
+    :Guardar producto\nen base de datos;
+    :Retornar producto creado;
+    :Actualizar listado\nen interfaz;
+    :Mostrar mensaje\nde éxito;
+  endif
+
+elseif (¿Qué operación?) then (Editar)
+  |Usuario|
+  :Seleccionar producto\na editar;
+  :Clic en "Editar";
+  :Modificar campos\ndeseados;
+  
+  |Sistema|
+  :Cargar datos actuales\nen formulario;
+  :Validar cambios;
+  
+  if (¿Datos válidos?) then (No)
+    :Mostrar errores;
+    |Usuario|
+    :Corregir datos;
+    |Sistema|
+  else (Sí)
+    :Buscar producto por ID;
+    if (¿Producto existe?) then (No)
+      :Retornar error 404;
+      :Mostrar "Producto no encontrado";
+    else (Sí)
+      :Actualizar campos\nmodificados;
+      :Actualizar timestamp\nupdatedAt;
+      :Guardar cambios\nen base de datos;
+      :Retornar producto actualizado;
+      :Actualizar listado\nen interfaz;
+      :Mostrar mensaje de éxito;
+    endif
+  endif
+
+elseif (¿Qué operación?) then (Eliminar)
+  |Usuario|
+  :Seleccionar producto\na eliminar;
+  :Clic en "Eliminar";
+  :Confirmar eliminación;
+  
+  |Sistema|
+  if (¿Confirmado?) then (No)
+    :Cancelar operación;
+  else (Sí)
+    :Buscar producto por ID;
+    if (¿Producto existe?) then (No)
+      :Retornar error 404;
+      :Mostrar "Producto no encontrado";
+    else (Sí)
+      :Eliminar producto\nde base de datos;
+      :Remover de listado\nen interfaz;
+      :Mostrar mensaje\nde éxito;
+    endif
+  endif
+
+elseif (¿Qué operación?) then (Buscar)
+  |Usuario|
+  :Ingresar término\nde búsqueda;
+  
+  |Sistema|
+  :Filtrar productos por:\n- Título\n- Descripción\n- Categoría;
+  :Mostrar resultados\nfiltrados;
+
+else (Ver detalle)
+  |Usuario|
+  :Clic en producto;
+  
+  |Sistema|
+  :Obtener producto por ID;
+  :Mostrar información\ncompleta del producto;
+endif
+
+|Usuario|
+:Continuar gestionando\ninventario;
+
+stop
+
+@enduml

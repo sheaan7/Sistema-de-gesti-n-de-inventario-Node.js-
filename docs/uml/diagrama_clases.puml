@@ -1,0 +1,188 @@
+@startuml Diagrama_Clases
+
+title Diagrama de Clases - Sistema de Gestión de Inventario
+
+' Modelo Product
+class Product {
+  - id: String
+  - title: String
+  - price: Number
+  - description: String
+  - category: String
+  - image: String
+  - rating: Rating
+  - createdAt: Date
+  - updatedAt: Date
+  --
+  + getId(): String
+  + setPrice(price: Number): void
+  + setDescription(desc: String): void
+  + toJSON(): Object
+}
+
+class Rating {
+  - rate: Number
+  - count: Number
+  --
+  + getRate(): Number
+  + getCount(): Number
+}
+
+' Database Layer
+class Database {
+  - dbPath: String
+  - products: Product[]
+  --
+  + read(): Product[]
+  + write(data: Product[]): Boolean
+  + findById(id: String): Product
+  + findAll(): Product[]
+  + create(product: Product): Product
+  + update(id: String, updates: Object): Product
+  + delete(id: String): Boolean
+  - generateId(): String
+  - ensureDataDir(): void
+}
+
+' Controller Layer
+class ProductController {
+  --
+  + getAllProducts(req, res): void
+  + getProductById(req, res): void
+  + createProduct(req, res): void
+  + updateProduct(req, res): void
+  + deleteProduct(req, res): void
+  + searchProducts(req, res): void
+  + getByCategory(req, res): void
+}
+
+class SyncController {
+  --
+  + getStatus(req, res): void
+  + syncNow(req, res): void
+}
+
+' Service Layer
+class SyncService {
+  - cronJob: CronJob
+  - isRunning: Boolean
+  - lastSync: Date
+  - stats: SyncStats
+  --
+  + start(): void
+  + stop(): void
+  + syncProducts(): Promise<void>
+  + getStatus(): SyncStatus
+  - fetchExternalProducts(): Promise<Product[]>
+  - mergeProducts(external: Product[]): SyncStats
+}
+
+class SyncStats {
+  + total: Number
+  + added: Number
+  + updated: Number
+  + errors: Number
+}
+
+class SyncStatus {
+  + isRunning: Boolean
+  + lastSync: Date
+  + nextSync: Date
+  + stats: SyncStats
+  + schedule: String
+}
+
+' API Client
+class ExternalAPIClient {
+  - baseURL: String
+  - timeout: Number
+  --
+  + fetchProducts(): Promise<Product[]>
+  + fetchProductById(id: String): Promise<Product>
+  - handleError(error): void
+}
+
+' Routes
+class ProductRoutes {
+  --
+  + GET /api/products
+  + GET /api/products/:id
+  + POST /api/products
+  + PUT /api/products/:id
+  + DELETE /api/products/:id
+  + GET /api/products/search
+  + GET /api/products/category/:category
+}
+
+class SyncRoutes {
+  --
+  + GET /api/sync/status
+  + POST /api/sync/now
+}
+
+' Express App
+class ExpressApp {
+  - port: Number
+  - middlewares: Middleware[]
+  --
+  + use(middleware): void
+  + listen(port): void
+  + get(path, handler): void
+  + post(path, handler): void
+  + put(path, handler): void
+  + delete(path, handler): void
+}
+
+' Middleware
+class ErrorHandler {
+  --
+  + notFound(req, res, next): void
+  + errorHandler(err, req, res, next): void
+}
+
+class CorsMiddleware {
+  --
+  + handle(req, res, next): void
+}
+
+' Relaciones
+Product "1" *-- "0..1" Rating : contains
+
+Database "1" --> "*" Product : manages
+
+ProductController --> Database : uses
+SyncController --> SyncService : uses
+
+SyncService --> Database : writes to
+SyncService --> ExternalAPIClient : fetches from
+SyncService "1" *-- "1" SyncStats : has
+SyncService --> SyncStatus : returns
+
+ProductRoutes --> ProductController : routes to
+SyncRoutes --> SyncController : routes to
+
+ExpressApp --> ProductRoutes : uses
+ExpressApp --> SyncRoutes : uses
+ExpressApp --> ErrorHandler : uses
+ExpressApp --> CorsMiddleware : uses
+
+ExternalAPIClient --> Product : creates
+
+note right of SyncService
+  Ejecuta sincronización periódica
+  usando node-cron cada 30 minutos
+  por defecto
+end note
+
+note right of Database
+  Persistencia en archivo JSON
+  para desarrollo local.
+  MongoDB para producción.
+end note
+
+note left of ExternalAPIClient
+  Conecta con FakeStore API
+  https://fakestoreapi.com
+end note
+
+@enduml

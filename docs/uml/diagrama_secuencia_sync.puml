@@ -1,0 +1,106 @@
+@startuml Diagrama_Secuencia_Sincronizacion
+
+title Diagrama de Secuencia - Sincronización Automática
+
+participant "Cron Job" as Cron
+participant "Sync\nService" as Sync
+participant "External\nAPI Client" as API
+participant "FakeStore\nAPI" as External
+participant "Database" as DB
+participant "File\nSystem" as FS
+
+== Inicio Automático ==
+
+Cron -> Sync: Trigger cada 30 minutos\n(*/30 * * * *)
+activate Sync
+
+Sync -> Sync: Verificar si isRunning
+alt Ya hay sincronización en progreso
+    Sync -> Cron: Saltar ejecución
+else Puede ejecutar
+    Sync -> Sync: isRunning = true
+    Sync -> Sync: Registrar inicio: Date.now()
+    
+    == Obtener Datos Externos ==
+    
+    Sync -> API: fetchProducts()
+    activate API
+    
+    API -> External: GET /products
+    activate External
+    
+    External --> API: Array de productos [20 items]
+    deactivate External
+    
+    API -> API: Transformar respuesta
+    API --> Sync: productos[]
+    deactivate API
+    
+    == Procesar y Fusionar Datos ==
+    
+    Sync -> DB: findAll()
+    activate DB
+    
+    DB -> FS: read products.json
+    activate FS
+    FS --> DB: productos locales
+    deactivate FS
+    
+    DB --> Sync: productos locales[]
+    deactivate DB
+    
+    Sync -> Sync: mergeProducts(external, local)
+    
+    loop Para cada producto externo
+        alt Producto no existe localmente
+            Sync -> DB: create(producto)
+            activate DB
+            DB -> FS: write products.json
+            activate FS
+            FS --> DB: OK
+            deactivate FS
+            DB --> Sync: producto creado
+            deactivate DB
+            Sync -> Sync: stats.added++
+        else Producto existe
+            Sync -> Sync: Comparar precios/descripción
+            alt Datos diferentes
+                Sync -> DB: update(id, newData)
+                activate DB
+                DB -> FS: write products.json
+                activate FS
+                FS --> DB: OK
+                deactivate FS
+                DB --> Sync: producto actualizado
+                deactivate DB
+                Sync -> Sync: stats.updated++
+            else Datos iguales
+                Sync -> Sync: Sin cambios
+            end
+        end
+        Sync -> Sync: stats.total++
+    end
+    
+    == Finalizar Sincronización ==
+    
+    Sync -> Sync: Calcular duración
+    Sync -> Sync: lastSync = Date.now()
+    Sync -> Sync: isRunning = false
+    
+    Sync -> Sync: Log resultado:\nDuración, stats
+    
+    Sync --> Cron: Sincronización completada
+end
+
+deactivate Sync
+
+note right of Sync
+  Estadísticas guardadas:
+  - total: número de productos procesados
+  - added: productos nuevos agregados
+  - updated: productos actualizados
+  - errors: errores encontrados
+  - duration: tiempo de ejecución
+end note
+
+@enduml

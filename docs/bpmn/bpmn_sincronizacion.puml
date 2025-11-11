@@ -1,0 +1,133 @@
+@startuml BPMN_Sincronizacion
+
+title BPMN - Proceso de Sincronización con API Externa
+
+|Scheduler (Cron)|
+start
+:Esperar intervalo\nconfigurado\n(cada 30 minutos);
+
+:Activar tarea de\nsincronización;
+
+|Sync Service|
+:Verificar estado\nde sincronización;
+
+if (¿Sincronización\nen progreso?) then (Sí)
+  :Registrar evento\n"Sincronización saltada";
+  stop
+else (No)
+  :Establecer flag\nisRunning = true;
+  :Registrar timestamp\nde inicio;
+  
+  == Fase de Obtención ==
+  
+  :Conectar con\nFakeStore API;
+  
+  |External API|
+  :Recibir petición\nGET /products;
+  
+  if (¿API disponible?) then (No)
+    |Sync Service|
+    :Registrar error\nde conexión;
+    :stats.errors++;
+    :Reintentará en\npróximo ciclo;
+    :isRunning = false;
+    stop
+  else (Sí)
+    :Retornar array de\n20 productos;
+    
+    |Sync Service|
+    :Recibir datos\nde productos externos;
+    
+    == Fase de Procesamiento ==
+    
+    :Leer productos\nlocales actuales;
+    
+    :Inicializar estadísticas:\n- total = 0\n- added = 0\n- updated = 0\n- errors = 0;
+    
+    fork
+      :Procesar producto 1;
+    fork again
+      :Procesar producto 2;
+    fork again
+      :Procesar producto 3;
+    fork again
+      :...;
+    fork again
+      :Procesar producto N;
+    end fork
+    
+    |Sync Service|
+    :Para cada producto\nexterno;
+    
+    repeat
+      :Buscar producto\nlocal por ID externo;
+      
+      if (¿Producto existe\nlocalmente?) then (No)
+        :Crear nuevo producto;
+        :Asignar ID único local;
+        :Agregar timestamps;
+        :Guardar en base de datos;
+        :stats.added++;
+      else (Sí)
+        :Comparar datos\n(precio, descripción,\nrating, etc.);
+        
+        if (¿Datos diferentes?) then (Sí)
+          :Actualizar campos\nmodificados;
+          :Actualizar timestamp\nupdatedAt;
+          :Guardar cambios;
+          :stats.updated++;
+        else (No)
+          :Sin cambios necesarios;
+        endif
+      endif
+      
+      :stats.total++;
+      
+    repeat while (¿Más productos\npor procesar?) is (Sí)
+    -> No;
+    
+    == Fase de Finalización ==
+    
+    :Calcular duración\ntotal del proceso;
+    
+    :Actualizar lastSync\ncon timestamp actual;
+    
+    :Establecer flag\nisRunning = false;
+    
+    :Registrar en log:\n- Duración\n- Estadísticas\n- Timestamp;
+    
+    if (¿Errores > 0?) then (Sí)
+      :Notificar errores\nen log;
+      note right
+        Los errores no detienen
+        el proceso completo
+      end note
+    endif
+    
+    :Guardar estadísticas\npara consulta posterior;
+    
+    |Scheduler (Cron)|
+    :Programar próxima\nejecución;
+    
+    stop
+  endif
+endif
+
+note right of "Sync Service"
+  Configuración:
+  - Intervalo: Variable de entorno SYNC_INTERVAL
+  - Patrón cron por defecto: */30 * * * *
+  - API Externa: https://fakestoreapi.com
+  - Timeout: 10 segundos
+end note
+
+note left of "External API"
+  FakeStore API proporciona:
+  - 20 productos de ejemplo
+  - Categorías: electronics, jewelery,
+    men's clothing, women's clothing
+  - Datos: id, title, price, description,
+    category, image, rating
+end note
+
+@enduml

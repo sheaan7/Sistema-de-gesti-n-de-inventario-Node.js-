@@ -1,5 +1,8 @@
 // Configuración
-const API_URL = 'http://localhost:3000/api';
+// En Docker, usar /api (proxy de nginx). En desarrollo local, usar http://localhost:3000/api
+const API_URL = window.location.hostname === 'localhost' && window.location.port === '8080' 
+  ? 'http://localhost:3000/api'
+  : '/api';
 
 // Estado
 let products = [];
