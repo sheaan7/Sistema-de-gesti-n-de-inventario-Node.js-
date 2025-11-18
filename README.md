@@ -276,7 +276,6 @@ docker-compose logs db
 - ✅ Decisiones de diseño justificadas
 - ✅ Tecnologías utilizadas documentadas
 - ✅ Aprendizajes obtenidos detallados
-- ✅ Prompts e instrucciones a IA documentados
 
 ## 🤝 Contribución
 

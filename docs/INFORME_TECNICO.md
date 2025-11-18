@@ -17,9 +17,8 @@
 7. [Implementación](#implementación)
 8. [Despliegue con Docker](#despliegue-con-docker)
 9. [Aprendizajes Obtenidos](#aprendizajes-obtenidos)
-10. [Prompts e Interacciones con IA](#prompts-e-interacciones-con-ia)
-11. [Conclusiones](#conclusiones)
-12. [Referencias](#referencias)
+10. [Conclusiones](#conclusiones)
+11. [Referencias](#referencias)
 
 ---
 
@@ -684,129 +683,9 @@ Lecciones sobre diseño de APIs RESTful:
 
 ---
 
-## 10. Prompts e Interacciones con IA
+## 10. Conclusiones
 
-### 10.1 Metodología de Trabajo con IA
-
-Durante el desarrollo del proyecto, se utilizó IA (GitHub Copilot, ChatGPT) como herramienta de asistencia, siguiendo estos principios:
-
-1. **No solicitar código completo:** Solo ayuda para resolver problemas específicos
-2. **Construcción propia:** Todo el código fue escrito y comprendido por el equipo
-3. **Validación:** Cada sugerencia fue revisada y adaptada
-4. **Aprendizaje:** Usar la IA para entender conceptos, no solo copiar
-
-### 10.2 Ejemplos de Prompts Utilizados
-
-#### 10.2.1 Configuración Inicial
-
-**Prompt 1: Estructura del proyecto**
-```
-"¿Cuál es una buena estructura de carpetas para un proyecto Node.js
-con Express que incluya separación de rutas, controladores y servicios?"
-```
-
-**Resultado:** Comprensión de arquitectura MVC en Node.js
-
-**Prompt 2: Docker Compose**
-```
-"Explícame cómo configurar docker-compose.yml para tres contenedores
-(frontend, backend, database) que se comuniquen entre sí"
-```
-
-**Resultado:** Entendimiento de redes Docker y dependencias entre servicios
-
-#### 10.2.2 Resolución de Problemas
-
-**Prompt 3: Sincronización**
-```
-"Tengo un servicio que debe ejecutarse cada 30 minutos con node-cron.
-¿Cómo evito que se ejecute múltiples veces si la anterior no terminó?"
-```
-
-**Resultado:** Implementación de flag isRunning
-
-**Prompt 4: Error Handling**
-```
-"¿Cuál es la mejor práctica para manejar errores en Express?
-Necesito un middleware centralizado"
-```
-
-**Resultado:** Implementación de errorHandler middleware
-
-#### 10.2.3 Optimización
-
-**Prompt 5: Performance**
-```
-"¿Qué índices debería crear en MongoDB para optimizar búsquedas
-por título, categoría y precio?"
-```
-
-**Resultado:** Creación de índices apropiados
-
-**Prompt 6: Nginx**
-```
-"Necesito configurar Nginx como proxy reverso para mi API Node.js.
-¿Cuál sería una configuración óptima?"
-```
-
-**Resultado:** Configuración de nginx.conf con proxy_pass
-
-#### 10.2.4 Debugging
-
-**Prompt 7: CORS Issues**
-```
-"Estoy obteniendo error CORS al llamar mi API desde el frontend
-en Docker. ¿Cómo lo soluciono?"
-```
-
-**Resultado:** Configuración correcta de CORS y proxy reverso
-
-**Prompt 8: Docker Networking**
-```
-"Mis contenedores Docker no pueden comunicarse entre sí.
-¿Cómo verifico la configuración de red?"
-```
-
-**Resultado:** Uso de docker network inspect y ajustes en docker-compose
-
-### 10.3 Código Generado vs. Código Propio
-
-| Componente | % IA | % Propio | Descripción |
-|------------|------|----------|-------------|
-| Estructura del proyecto | 20% | 80% | IA sugirió estructura, nosotros la adaptamos |
-| Controllers | 10% | 90% | Lógica implementada por nosotros |
-| Database layer | 5% | 95% | Diseño propio basado en requerimientos |
-| Sync Service | 30% | 70% | IA ayudó con node-cron, lógica propia |
-| Frontend | 15% | 85% | Diseño y funcionalidad propios |
-| Docker configs | 40% | 60% | IA ayudó con sintaxis, config propia |
-| Documentación | 10% | 90% | Contenido propio |
-
-### 10.4 Aprendizajes sobre Uso de IA
-
-**Ventajas:**
-- Acelera la resolución de problemas técnicos específicos
-- Ayuda a entender conceptos nuevos
-- Sugiere mejores prácticas
-- Detecta potenciales bugs
-
-**Limitaciones:**
-- No comprende el contexto completo del proyecto
-- Puede sugerir soluciones genéricas no óptimas
-- Requiere validación y adaptación constante
-- No reemplaza el entendimiento profundo
-
-**Mejores Prácticas Identificadas:**
-1. Hacer preguntas específicas y contextualizadas
-2. No aceptar código sin entenderlo
-3. Usar IA para aprender, no solo para copiar
-4. Validar todas las sugerencias con documentación oficial
-5. Adaptar el código sugerido a las necesidades específicas
-
----
-
-## 11. Conclusiones
-
-### 11.1 Objetivos Alcanzados
+### 10.1 Objetivos Alcanzados
 
 ✅ **Sistema completo de gestión de inventarios**
 - CRUD funcional con validación robusta
@@ -836,7 +715,7 @@ en Docker. ¿Cómo lo soluciono?"
 - Persistencia de datos garantizada
 - Health checks implementados
 
-### 11.2 Fortalezas del Proyecto
+### 10.2 Fortalezas del Proyecto
 
 1. **Arquitectura Sólida:** Separación clara de capas facilita mantenimiento
 2. **Escalabilidad:** Diseño permite crecimiento horizontal
@@ -845,29 +724,29 @@ en Docker. ¿Cómo lo soluciono?"
 5. **Automatización:** Sincronización sin intervención manual
 6. **Portabilidad:** Docker garantiza "runs everywhere"
 
-### 11.3 Áreas de Mejora
+### 10.3 Áreas de Mejora
 
-#### 11.3.1 Corto Plazo
+#### 10.3.1 Corto Plazo
 - [ ] Implementar testing automatizado (Jest, Mocha)
 - [ ] Añadir logging estructurado (Winston, Pino)
 - [ ] Mejorar manejo de errores con códigos más específicos
 - [ ] Implementar rate limiting en la API
 
-#### 11.3.2 Mediano Plazo
+#### 10.3.2 Mediano Plazo
 - [ ] Sistema de autenticación (JWT)
 - [ ] Roles y permisos
 - [ ] Paginación en listados
 - [ ] WebSockets para actualizaciones en tiempo real
 - [ ] Dashboard con métricas
 
-#### 11.3.3 Largo Plazo
+#### 10.3.3 Largo Plazo
 - [ ] Migrar a TypeScript
 - [ ] Implementar caché (Redis)
 - [ ] CI/CD pipeline
 - [ ] Monitoreo y observabilidad (Prometheus, Grafana)
 - [ ] Kubernetes para orquestación avanzada
 
-### 11.4 Lecciones Aprendidas
+### 10.4 Lecciones Aprendidas
 
 1. **Planificación es clave:** Diseño previo ahorra tiempo de desarrollo
 2. **Documentación continua:** Documentar mientras se desarrolla es más eficiente
@@ -875,7 +754,7 @@ en Docker. ¿Cómo lo soluciono?"
 4. **Simplicidad primero:** Empezar simple y luego iterar
 5. **Herramientas adecuadas:** Elegir tecnologías según necesidades reales
 
-### 11.5 Impacto del Proyecto
+### 10.5 Impacto del Proyecto
 
 Este proyecto ha demostrado:
 - Capacidad de diseñar sistemas escalables
@@ -884,7 +763,7 @@ Este proyecto ha demostrado:
 - Competencia en DevOps con Docker
 - Habilidad para documentar profesionalmente
 
-### 11.6 Reflexión Final
+### 10.6 Reflexión Final
 
 El desarrollo de este sistema de gestión de inventarios ha sido una experiencia completa que abarcó desde el diseño arquitectónico hasta el despliegue en producción. El proyecto no solo cumplió con los requisitos técnicos establecidos, sino que también proporcionó un profundo aprendizaje en:
 
@@ -898,9 +777,9 @@ El sistema resultante es funcional, mantenible y preparado para escalar según l
 
 ---
 
-## 12. Referencias
+## 11. Referencias
 
-### 12.1 Documentación Oficial
+### 11.1 Documentación Oficial
 
 1. **Node.js**
    - https://nodejs.org/docs/
@@ -920,12 +799,12 @@ El sistema resultante es funcional, mantenible y preparado para escalar según l
 6. **Nginx**
    - https://nginx.org/en/docs/
 
-### 12.2 APIs Externas
+### 11.2 APIs Externas
 
 1. **FakeStore API**
    - https://fakestoreapi.com/docs
 
-### 12.3 Librerías Utilizadas
+### 11.3 Librerías Utilizadas
 
 1. **node-cron**
    - https://www.npmjs.com/package/node-cron
@@ -939,7 +818,7 @@ El sistema resultante es funcional, mantenible y preparado para escalar según l
 4. **dotenv**
    - https://www.npmjs.com/package/dotenv
 
-### 12.4 Recursos de Aprendizaje
+### 11.4 Recursos de Aprendizaje
 
 1. **MDN Web Docs**
    - https://developer.mozilla.org/
@@ -953,7 +832,7 @@ El sistema resultante es funcional, mantenible y preparado para escalar según l
 4. **MongoDB University**
    - https://university.mongodb.com/
 
-### 12.5 Herramientas
+### 11.5 Herramientas
 
 1. **PlantUML**
    - https://plantuml.com/

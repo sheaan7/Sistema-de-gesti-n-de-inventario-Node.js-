@@ -64,7 +64,6 @@
    - Implementación detallada
    - Despliegue con Docker
    - Aprendizajes obtenidos
-   - Prompts e interacciones con IA
    - Conclusiones y roadmap
 
 ---
@@ -368,7 +367,6 @@ curl http://localhost:3000/api/products
   - [x] Decisiones de diseño
   - [x] Tecnologías utilizadas
   - [x] Aprendizajes obtenidos
-  - [x] Prompts e instrucciones a IA
 
 ### Estadísticas del Proyecto
 
