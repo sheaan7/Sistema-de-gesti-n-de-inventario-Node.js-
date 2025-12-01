@@ -7,19 +7,19 @@ Sistema completo de gestión de inventarios con sincronización automática a AP
 ![MongoDB](https://img.shields.io/badge/MongoDB-7-green)
 ![Docker](https://img.shields.io/badge/Docker-20.10+-blue)
 
-## 📋 Características
+## Características
 
-- ✅ **CRUD Completo** - Crear, leer, actualizar y eliminar productos
-- 🔄 **Sincronización Automática** - Integración con FakeStore API cada 30 minutos
-- 🔍 **Búsqueda Avanzada** - Búsqueda por título, descripción y categoría
-- 🏷️ **Filtrado por Categoría** - Organización intuitiva de productos
-- 📊 **Dashboard Intuitivo** - Interfaz web moderna y responsiva
-- 🐳 **Docker Ready** - Despliegue con un solo comando
-- 📚 **API RESTful** - 10 endpoints bien documentados
-- 🔐 **Validación Robusta** - Validación en múltiples capas
-- 📈 **Estadísticas de Sincronización** - Monitoreo en tiempo real
+-  **CRUD Completo** - Crear, leer, actualizar y eliminar productos
+-  **Sincronización Automática** - Integración con FakeStore API cada 30 minutos
+-  **Búsqueda Avanzada** - Búsqueda por título, descripción y categoría
+-  **Filtrado por Categoría** - Organización intuitiva de productos
+-  **Dashboard Intuitivo** - Interfaz web moderna y responsiva
+-  **Docker Ready** - Despliegue con un solo comando
+-  **API RESTful** - 10 endpoints bien documentados
+-  **Validación Robusta** - Validación en múltiples capas
+-  **Estadísticas de Sincronización** - Monitoreo en tiempo real
 
-## 🏗️ Arquitectura
+##  Arquitectura
 
 El sistema utiliza una arquitectura de microservicios con tres contenedores:
 
@@ -31,7 +31,7 @@ El sistema utiliza una arquitectura de microservicios con tres contenedores:
 └─────────────┘     └─────────────┘     └─────────────┘
 ```
 
-## 🚀 Inicio Rápido
+##  Inicio Rápido
 
 ### Opción 1: Docker (Recomendado)
 
@@ -66,9 +66,9 @@ npm start
 
 ### Documentos Principales
 
-- 📘 [**Guía de Ejecución**](docs/GUIA_EJECUCION.md) - Instrucciones detalladas de instalación y uso
-- 📗 [**Especificación de API**](docs/ESPECIFICACION_API.md) - Documentación completa de endpoints
-- 📕 [**Informe Técnico**](docs/INFORME_TECNICO.md) - Decisiones de diseño y aprendizajes
+-  [**Guía de Ejecución**](docs/GUIA_EJECUCION.md) - Instrucciones detalladas de instalación y uso
+-  [**Especificación de API**](docs/ESPECIFICACION_API.md) - Documentación completa de endpoints
+-  [**Informe Técnico**](docs/INFORME_TECNICO.md) - Decisiones de diseño y aprendizajes
 
 ### Diagramas
 
@@ -131,7 +131,7 @@ npm start
 - Docker
 - Docker Compose
 
-## 📁 Estructura del Proyecto
+##  Estructura del Proyecto
 
 ```
 Sistema-de-gesti-n-de-inventario-Node.js-/
@@ -163,7 +163,7 @@ Sistema-de-gesti-n-de-inventario-Node.js-/
 └── docker-compose.yml   # Orquestación
 ```
 
-## ⚙️ Configuración
+##  Configuración
 
 ### Variables de Entorno (Backend)
 
@@ -175,7 +175,7 @@ EXTERNAL_API_URL=https://fakestoreapi.com
 SYNC_INTERVAL=*/30 * * * *
 ```
 
-## 🧪 Testing
+##  Testing
 
 ```bash
 # Probar API con cURL
@@ -188,7 +188,7 @@ curl -X POST http://localhost:3000/api/products \
   -d '{"title":"Test","price":9.99}'
 ```
 
-## 📊 Monitoreo
+##  Monitoreo
 
 ```bash
 # Ver logs
@@ -206,7 +206,7 @@ docker-compose ps
 docker stats
 ```
 
-## 🔧 Comandos Útiles
+##  Comandos Útiles
 
 ```bash
 # Detener servicios
@@ -225,7 +225,7 @@ docker-compose restart backend
 docker exec -it inventory-backend sh
 ```
 
-## 🐛 Solución de Problemas
+##  Solución de Problemas
 
 ### Puerto en uso
 ```bash
@@ -251,73 +251,40 @@ docker-compose restart db
 docker-compose logs db
 ```
 
-## 📋 Entregables Completados
+##  Entregables Completados
 
-✅ **Aplicación funcional**
+ **Aplicación funcional**
 - CRUD completo de productos
 - Sincronización automática con FakeStore API
 - Frontend interactivo
 
-✅ **Documentación completa**
-- ✅ 3 Diagramas UML (Clases, Secuencia x2)
-- ✅ 3 Diagramas BPMN (Gestión, Sincronización, Despliegue)
-- ✅ 1 Diagrama de Arquitectura
-- ✅ Especificación de API completa
-- ✅ Guía de ejecución detallada
-- ✅ Informe técnico completo
+ **Documentación completa**
+-  3 Diagramas UML (Clases, Secuencia x2)
+-  3 Diagramas BPMN (Gestión, Sincronización, Despliegue)
+-  1 Diagrama de Arquitectura
+-  Especificación de API completa
+-  Guía de ejecución detallada
+-  Informe técnico completo
 
-✅ **Docker**
-- ✅ Frontend en contenedor separado (Nginx)
-- ✅ Backend en contenedor separado (Node.js)
-- ✅ Base de datos en contenedor separado (MongoDB)
-- ✅ Docker Compose para orquestación
+ **Docker**
+-  Frontend en contenedor separado (Nginx)
+-  Backend en contenedor separado (Node.js)
+-  Base de datos en contenedor separado (MongoDB)
+-  Docker Compose para orquestación
 
-✅ **Informe técnico**
-- ✅ Decisiones de diseño justificadas
-- ✅ Tecnologías utilizadas documentadas
-- ✅ Aprendizajes obtenidos detallados
-
-## 🤝 Contribución
-
-Este es un proyecto académico. Para contribuir:
-
-1. Fork el proyecto
-2. Crea una rama (`git checkout -b feature/AmazingFeature`)
-3. Commit cambios (`git commit -m 'Add AmazingFeature'`)
-4. Push a la rama (`git push origin feature/AmazingFeature`)
-5. Abre un Pull Request
+ **Informe técnico**
+-  Decisiones de diseño justificadas
+-  Tecnologías utilizadas documentadas
+-  Aprendizajes obtenidos detallados
 
 ## 📝 Licencia
 
-Este proyecto es de uso académico.
+Este proyecto es de uso académico. ;)
 
-## 👥 Equipo
 
-- [Nombre 1] - Desarrollo Backend
-- [Nombre 2] - Desarrollo Frontend
-- [Nombre 3] - Base de Datos y Docker
-- [Nombre 4] - Documentación y Testing
 
-## 🎯 Roadmap
-
-- [ ] Sistema de autenticación JWT
-- [ ] Tests automatizados (Jest)
-- [ ] Paginación en listados
-- [ ] WebSockets para updates en tiempo real
-- [ ] Dashboard con métricas
-- [ ] Exportación a Excel/PDF
-- [ ] Notificaciones por email
-- [ ] API versioning
-- [ ] Rate limiting
-- [ ] CI/CD pipeline
-
-## 📞 Soporte
-
-Para reportar problemas o sugerencias, crear un issue en el repositorio.
-
----
-
-**Desarrollado con ❤️ para el curso de [Nombre del Curso]**
-
+**Desarrollado con ❤️ por:**
+- Jean Pierre Perez (Backend y Frontend)
+- Daniel V. (Docker y DB )
 **Universidad:** [Nombre de la Universidad]  
 **Fecha de Entrega:** 18 de noviembre 2025
