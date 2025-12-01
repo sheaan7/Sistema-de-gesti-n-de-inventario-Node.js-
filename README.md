@@ -286,5 +286,4 @@ Este proyecto es de uso académico. ;)
 **Desarrollado con ❤️ por:**
 - Jean Pierre Perez (Backend y Frontend)
 - Daniel V. (Docker y DB )
-**Universidad:** [Nombre de la Universidad]  
-**Fecha de Entrega:** 18 de noviembre 2025
+
